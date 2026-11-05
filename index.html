@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ParkCinema Theatre — Tickets</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <h1>ParkCinema Theatre</h1>
+      <p class="hint">
+        Click a seat to see its details, then press Add to cart.
+      </p>
+    </header>
+
+    <main class="layout">
+      <section class="map-panel" aria-label="Seat map">
+        <div class="map-controls">
+          <button type="button" data-action="zoom-in" aria-label="Zoom in">
+            +
+          </button>
+          <button type="button" data-action="zoom-out" aria-label="Zoom out">
+            -
+          </button>
+          <button type="button" data-action="up" aria-label="Move up">↑</button>
+          <button type="button" data-action="down" aria-label="Move down">
+            ↓
+          </button>
+          <button type="button" data-action="left" aria-label="Move left">
+            ←
+          </button>
+          <button type="button" data-action="right" aria-label="Move right">
+            →
+          </button>
+          <button type="button" data-action="reset">Reset</button>
+        </div>
+
+        <div id="viewport">
+          <div id="map">
+            <div class="screen">Stage</div>
+            <div id="rows"></div>
+          </div>
+        </div>
+
+        <ul id="legend"></ul>
+      </section>
+
+      <aside class="side">
+        <section class="details-panel" aria-labelledby="details-title">
+          <h2 id="details-title">Seat details</h2>
+          <div id="details"></div>
+          <button type="button" id="add-to-cart" disabled>Add to cart</button>
+        </section>
+
+        <section class="cart-panel" aria-labelledby="cart-title">
+          <h2 id="cart-title">Cart (<span id="cart-count">0</span>)</h2>
+          <ul id="cart-items"></ul>
+          <p class="cart-total">
+            Total: <strong id="cart-total">$0.00</strong>
+          </p>
+        </section>
+      </aside>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
