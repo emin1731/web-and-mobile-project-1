@@ -6,6 +6,12 @@
   --border: #ddd6cb;
   --accent: #7a2e3b;
   --accent-text: #ffffff;
+  --screen: #9a9a9a;
+  --screen-border: #6f6f6f;
+  --zone-front: #dbe8f4;
+  --zone-middle: #dcefd8;
+  --zone-premium: #f3e2b6;
+  --unavailable: #c4c0b9;
 
   --radius: 8px;
   --gap: 16px;
@@ -82,4 +88,94 @@ button {
   .layout {
     grid-template-columns: 1fr;
   }
+}
+
+/* Screen */
+
+.screen {
+  width: 60%;
+  max-width: 400px;
+  margin: 0 auto 24px;
+  padding: 6px 0;
+  color: var(--surface);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-align: center;
+  text-transform: uppercase;
+  background-color: var(--screen);
+  border: 2px solid var(--screen-border);
+  border-radius: var(--radius);
+}
+
+/* Seats */
+
+#rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.seat {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+}
+
+.seat.aisle {
+  margin-right: 26px;
+}
+
+.seat:disabled {
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+/* Zones — class names are "zone-" + the zone keys in app.js */
+
+.zone-front {
+  background: var(--zone-front);
+}
+
+.zone-middle {
+  background: var(--zone-middle);
+}
+
+.zone-premium {
+  background: var(--zone-premium);
+}
+
+.unavailable {
+  background: var(--unavailable);
+}
+
+/* Legend */
+
+#legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--gap);
+  margin: var(--gap) 0 0;
+  padding: 0;
+  padding-bottom: 8px;
+  list-style: none;
+}
+
+#legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
 }

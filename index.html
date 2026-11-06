@@ -16,6 +16,13 @@
 
     <main class="layout">
       <section class="map-panel" aria-label="Seat map">
+        <div id="viewport">
+          <div id="map">
+            <div class="screen">Stage</div>
+            <div id="rows"></div>
+          </div>
+        </div>
+        <ul id="legend"></ul>
         <div class="map-controls">
           <button type="button" data-action="zoom-in" aria-label="Zoom in">
             +
@@ -35,15 +42,6 @@
           </button>
           <button type="button" data-action="reset">Reset</button>
         </div>
-
-        <div id="viewport">
-          <div id="map">
-            <div class="screen">Stage</div>
-            <div id="rows"></div>
-          </div>
-        </div>
-
-        <ul id="legend"></ul>
       </section>
 
       <aside class="side">
