@@ -6,8 +6,8 @@
   --border: #ddd6cb;
   --accent: #7a2e3b;
   --accent-text: #ffffff;
-  --screen: #9a9a9a;
-  --screen-border: #6f6f6f;
+  --screen: #dcdcdc;
+  --screen-border: #c1bfbf;
   --zone-front: #dbe8f4;
   --zone-middle: #dcefd8;
   --zone-premium: #f3e2b6;
@@ -96,7 +96,7 @@ button {
   width: 60%;
   max-width: 400px;
   margin: 0 auto 24px;
-  padding: 6px 0;
+  padding: 8px 0;
   color: var(--surface);
   font-size: 0.85rem;
   letter-spacing: 0.1em;
@@ -122,7 +122,7 @@ button {
 }
 
 .seat {
-  width: 36px;
+  width: 46px;
   height: 36px;
   padding: 0;
 }
@@ -159,7 +159,6 @@ button {
 #legend {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
   gap: var(--gap);
   margin: var(--gap) 0 0;
   padding: 0;
