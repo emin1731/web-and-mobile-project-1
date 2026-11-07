@@ -27,18 +27,26 @@ const rows = [
 let selectedSeat = null;
 let cart = [];
 
+function makeSeat(row, number) {
+  return {
+    id: `${row.name}-${number}`,
+    row: row.name,
+    number,
+    zone: zones[row.zone],
+  };
+}
+
 // Seat map
 
 function createSeat(row, number) {
-  const zone = zones[row.zone];
-  const id = `${row.name}-${number}`;
+  const seatData = makeSeat(row, number);
   const seat = document.createElement("button");
   seat.type = "button";
   seat.className = `seat zone-${row.zone}`;
-  seat.dataset.seat = id;
+  seat.dataset.seat = seatData.id;
   seat.textContent = number;
   seat.addEventListener("click", () => {
-    selectSeat({ id, row: row.name, number, zone });
+    selectSeat(seatData);
   });
 
   // Add the "aisle" class to seats that are next to the aisle
@@ -135,6 +143,7 @@ function addToCart() {
 
   cart.push(selectedSeat);
   findSeatButton(selectedSeat.id).classList.add("in-cart");
+  saveCart();
   renderCart();
   renderDetails();
 }
@@ -142,6 +151,7 @@ function addToCart() {
 function removeFromCart(id) {
   cart = cart.filter((seat) => seat.id !== id);
   findSeatButton(id).classList.remove("in-cart");
+  saveCart();
   renderCart();
   renderDetails();
 }
@@ -169,9 +179,57 @@ function renderCart() {
   document.getElementById("cart-total").textContent = `$${total.toFixed(2)}`;
 }
 
+// Saving the cart
+// Only the row and seat number are stored. Zone and price are looked up
+// from the data again on load, so they always match the current prices.
+
+const storageKey = "parkcinema-cart";
+
+function saveCart() {
+  const saved = cart.map((seat) => ({ row: seat.row, number: seat.number }));
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(saved));
+  } catch (e) {
+    console.error("Failed to save cart to localStorage:", e);
+  }
+}
+
+function loadCart() {
+  let saved;
+  try {
+    saved = JSON.parse(localStorage.getItem(storageKey));
+  } catch (e) {
+    console.error("Failed to load cart from localStorage:", e);
+  }
+  if (!Array.isArray(saved)) {
+    console.warn("Saved cart is not an array:", saved);
+    return;
+  }
+
+  for (const item of saved) {
+    const row = rows.find((r) => r.name === item?.row);
+    // Skip seats that no longer exist, have become unavailable, or are duplicates
+    if (
+      !row ||
+      !Number.isInteger(item.number) ||
+      item.number < 1 ||
+      item.number > seatsPerRow ||
+      row.unavailable.includes(item.number)
+    ) {
+      continue;
+    }
+    const seat = makeSeat(row, item.number);
+    if (isInCart(seat.id)) continue;
+
+    cart.push(seat);
+    findSeatButton(seat.id).classList.add("in-cart");
+  }
+}
+
 document.getElementById("add-to-cart").addEventListener("click", addToCart);
 
-renderMap();
+renderMap(); // must come before loadCart, which colors the seats on the map
+loadCart();
 renderLegend();
 renderDetails();
 renderCart();
