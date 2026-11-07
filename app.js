@@ -226,6 +226,78 @@ function loadCart() {
   }
 }
 
+// Map view (zoom and movement)
+// The map is moved inside #viewport with a CSS transform: translate(x, y) scale(zoom)
+
+const minZoom = 0.5;
+const maxZoom = 2;
+const zoomStep = 0.25;
+const moveStep = 40;
+
+const view = { zoom: 1, x: 0, y: 0 };
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+// How far the map may move from the center: half the viewport, so the
+// middle of the map always stays inside the frame and can't get lost.
+function moveLimit() {
+  const viewport = document.getElementById("viewport");
+  return { x: viewport.clientWidth / 2, y: viewport.clientHeight / 2 };
+}
+
+function setZoom(newZoom) {
+  newZoom = clamp(newZoom, minZoom, maxZoom);
+  // Scale the offset too, so the part of the map in the middle stays in the middle
+  view.x = (view.x * newZoom) / view.zoom;
+  view.y = (view.y * newZoom) / view.zoom;
+  view.zoom = newZoom;
+}
+
+function renderView() {
+  const limit = moveLimit();
+  view.x = clamp(view.x, -limit.x, limit.x);
+  view.y = clamp(view.y, -limit.y, limit.y);
+
+  document.getElementById("map").style.transform =
+    `translate(${view.x}px, ${view.y}px) scale(${view.zoom})`;
+
+  // Disable the buttons that would have no effect
+  const button = (action) =>
+    document.querySelector(`[data-action="${action}"]`);
+  button("zoom-in").disabled = view.zoom >= maxZoom;
+  button("zoom-out").disabled = view.zoom <= minZoom;
+  button("up").disabled = view.y >= limit.y;
+  button("down").disabled = view.y <= -limit.y;
+  button("left").disabled = view.x >= limit.x;
+  button("right").disabled = view.x <= -limit.x;
+  button("reset").disabled = view.zoom === 1 && view.x === 0 && view.y === 0;
+}
+
+// The arrows move the view, like scrolling: "down" shows more of the bottom
+// of the map, so the map itself moves up.
+function handleMapControl(action) {
+  if (action === "zoom-in") setZoom(view.zoom + zoomStep);
+  else if (action === "zoom-out") setZoom(view.zoom - zoomStep);
+  else if (action === "up") view.y += moveStep;
+  else if (action === "down") view.y -= moveStep;
+  else if (action === "left") view.x += moveStep;
+  else if (action === "right") view.x -= moveStep;
+  else if (action === "reset") {
+    view.zoom = 1;
+    view.x = 0;
+    view.y = 0;
+  }
+  renderView();
+}
+
+document.querySelectorAll(".map-controls button").forEach((button) => {
+  button.addEventListener("click", () =>
+    handleMapControl(button.dataset.action),
+  );
+});
+
 document.getElementById("add-to-cart").addEventListener("click", addToCart);
 
 renderMap(); // must come before loadCart, which colors the seats on the map
@@ -233,3 +305,4 @@ loadCart();
 renderLegend();
 renderDetails();
 renderCart();
+renderView();

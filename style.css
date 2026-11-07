@@ -90,6 +90,33 @@ button {
   }
 }
 
+/* Map view — #viewport is the visible frame, #map moves and zooms inside it */
+
+#viewport {
+  display: flex;
+  align-items: center;
+  height: 360px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+#map {
+  width: 100%;
+  transition: transform 0.2s ease;
+}
+
+.map-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.map-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Screen */
 
 .screen {
