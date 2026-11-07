@@ -127,6 +127,14 @@ button {
   padding: 0;
 }
 
+.row-label {
+  width: 20px;
+  align-self: center;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: center;
+}
+
 .seat.aisle {
   margin-right: 26px;
 }
@@ -154,6 +162,19 @@ button {
   background: var(--unavailable);
 }
 
+/* Seat states — after the zone colors so they take priority */
+
+.in-cart {
+  color: var(--accent-text);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.inspected {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+}
+
 /* Legend */
 
 #legend {
@@ -177,4 +198,39 @@ button {
   height: 16px;
   border: 1px solid var(--border);
   border-radius: 4px;
+}
+
+.swatch.inspected {
+  outline-width: 2px;
+  outline-offset: 1px;
+}
+
+/* Details and cart */
+
+#details p {
+  margin: 0 0 4px;
+}
+
+#details {
+  margin-bottom: 12px;
+}
+
+#add-to-cart:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#cart-items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#cart-items li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
 }
