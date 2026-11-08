@@ -189,6 +189,7 @@ function renderCart() {
     total += seat.zone.price;
   }
 
+  document.getElementById("cart-empty").hidden = cart.length > 0;
   document.getElementById("cart-count").textContent = cart.length;
   document.getElementById("cart-total").textContent = `$${total.toFixed(2)}`;
 }
@@ -211,7 +212,9 @@ function saveCart() {
 function loadCart() {
   let saved;
   try {
-    saved = JSON.parse(localStorage.getItem(storageKey));
+    const stored = localStorage.getItem(storageKey);
+    if (stored === null) return; // first visit, nothing saved yet
+    saved = JSON.parse(stored);
   } catch (e) {
     console.error("Failed to load cart from localStorage:", e);
   }
@@ -358,5 +361,12 @@ loadCart();
 renderLegend();
 renderDetails();
 renderCart();
+
+// Show the fitted hall straight away, without animating from full size.
+// Reading offsetWidth applies the transform before the animation is back on.
+const map = document.getElementById("map");
+map.style.transition = "none";
 updateFitZoom();
 renderView();
+map.offsetWidth;
+map.style.transition = "";
