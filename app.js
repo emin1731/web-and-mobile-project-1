@@ -7,22 +7,24 @@
 //   seats: how many seats the row has, numbered from 1
 //   aislesAfter: seat numbers that have an aisle after them
 //   unavailable: seat numbers that can't be booked
+// Prices follow the viewing quality: the middle-back rows have the best view
 const zones = {
-  front: { name: "Front", price: 15 },
-  middle: { name: "Middle", price: 20 },
-  premium: { name: "Premium", price: 25 },
+  front: { name: "Front", price: 8 },
+  standard: { name: "Standard", price: 12 },
+  premium: { name: "Premium", price: 16 },
+  back: { name: "Back", price: 10 },
 };
 
 // The IMAX hall: every row has a 4-seat block on each side of the center block
 const rows = [
-  { name: "10", zone: "premium", seats: 17, aislesAfter: [4, 13], unavailable: [8, 9] },
-  { name: "9", zone: "premium", seats: 24, aislesAfter: [4, 20], unavailable: [1, 12, 13] },
+  { name: "10", zone: "back", seats: 17, aislesAfter: [4, 13], unavailable: [8, 9] },
+  { name: "9", zone: "back", seats: 24, aislesAfter: [4, 20], unavailable: [1, 12, 13] },
   { name: "8", zone: "premium", seats: 31, aislesAfter: [4, 27], unavailable: [15, 16, 30] },
-  { name: "7", zone: "middle", seats: 33, aislesAfter: [4, 29], unavailable: [5, 16, 17, 33] },
-  { name: "6", zone: "middle", seats: 33, aislesAfter: [4, 29], unavailable: [10, 11, 24] },
-  { name: "5", zone: "middle", seats: 33, aislesAfter: [4, 29], unavailable: [1, 2, 20] },
-  { name: "4", zone: "middle", seats: 33, aislesAfter: [4, 29], unavailable: [14, 28] },
-  { name: "3", zone: "front", seats: 33, aislesAfter: [4, 29], unavailable: [6, 18, 19] },
+  { name: "7", zone: "premium", seats: 33, aislesAfter: [4, 29], unavailable: [5, 16, 17, 33] },
+  { name: "6", zone: "premium", seats: 33, aislesAfter: [4, 29], unavailable: [10, 11, 24] },
+  { name: "5", zone: "standard", seats: 33, aislesAfter: [4, 29], unavailable: [1, 2, 20] },
+  { name: "4", zone: "standard", seats: 33, aislesAfter: [4, 29], unavailable: [14, 28] },
+  { name: "3", zone: "standard", seats: 33, aislesAfter: [4, 29], unavailable: [6, 18, 19] },
   { name: "2", zone: "front", seats: 20, aislesAfter: [4, 16], unavailable: [10, 11] },
   { name: "1", zone: "front", seats: 24, aislesAfter: [4, 20], unavailable: [1, 24] },
 ];
@@ -95,7 +97,12 @@ function renderLegend() {
   const legend = document.getElementById("legend");
   for (const key in zones) {
     const zone = zones[key];
-    legend.innerHTML += `<li><span class="swatch zone-${key}"></span>${zone.name}: $${zone.price}</li>`;
+    // Each zone covers a continuous block of rows, so show the first and last
+    const numbers = rows
+      .filter((row) => row.zone === key)
+      .map((row) => Number(row.name));
+    const rowRange = `rows ${Math.min(...numbers)}–${Math.max(...numbers)}`;
+    legend.innerHTML += `<li><span class="swatch zone-${key}"></span>${zone.name} (${rowRange}): $${zone.price}</li>`;
   }
   legend.innerHTML += `<li><span class="swatch inspected"></span>Selected</li>`;
   legend.innerHTML += `<li><span class="swatch in-cart"></span>In cart</li>`;
@@ -235,27 +242,56 @@ function loadCart() {
 
 // Map view (zoom and movement)
 // The map is moved inside #viewport with a CSS transform: translate(x, y) scale(zoom)
+// Zoom 1 is the map's real size. The smallest zoom is the one at which the
+// whole hall fits in the frame, which is also what Reset shows.
 
-const minZoom = 0.5;
 const maxZoom = 2;
-const zoomStep = 0.25;
-const moveStep = 40;
+const zoomFactor = 1.4; // each zoom click multiplies or divides by this
+const moveFraction = 0.2; // each arrow click moves a fifth of the frame
 
 const view = { zoom: 1, x: 0, y: 0 };
+let fitZoom = 1;
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
 }
 
-// How far the map may move from the center: half the viewport, so the
-// middle of the map always stays inside the frame and can't get lost.
+function updateFitZoom() {
+  const viewport = document.getElementById("viewport");
+  const map = document.getElementById("map");
+  const wasReset = isResetView();
+  fitZoom = Math.min(
+    1,
+    viewport.clientWidth / map.offsetWidth,
+    viewport.clientHeight / map.offsetHeight,
+  );
+  // Keep showing the whole hall if the user hadn't moved the view
+  if (wasReset) view.zoom = fitZoom;
+  else view.zoom = clamp(view.zoom, fitZoom, maxZoom);
+}
+
+function isResetView() {
+  return view.zoom === fitZoom && view.x === 0 && view.y === 0;
+}
+
+// How far the map may move from the center: far enough to bring every edge
+// of the zoomed map into view, and at least half the viewport, so the middle
+// of the map always stays inside the frame and can't get lost.
 function moveLimit() {
   const viewport = document.getElementById("viewport");
-  return { x: viewport.clientWidth / 2, y: viewport.clientHeight / 2 };
+  const map = document.getElementById("map");
+  const overflowX = (map.offsetWidth * view.zoom - viewport.clientWidth) / 2;
+  const overflowY = (map.offsetHeight * view.zoom - viewport.clientHeight) / 2;
+  return {
+    x: Math.max(viewport.clientWidth / 2, overflowX),
+    y: Math.max(viewport.clientHeight / 2, overflowY),
+  };
 }
 
 function setZoom(newZoom) {
-  newZoom = clamp(newZoom, minZoom, maxZoom);
+  newZoom = clamp(newZoom, fitZoom, maxZoom);
+  // Zooming in and back out can leave a rounding error, so snap to the fit
+  if (newZoom / fitZoom < 1.001) newZoom = fitZoom;
   // Scale the offset too, so the part of the map in the middle stays in the middle
   view.x = (view.x * newZoom) / view.zoom;
   view.y = (view.y * newZoom) / view.zoom;
@@ -274,25 +310,29 @@ function renderView() {
   const button = (action) =>
     document.querySelector(`[data-action="${action}"]`);
   button("zoom-in").disabled = view.zoom >= maxZoom;
-  button("zoom-out").disabled = view.zoom <= minZoom;
+  button("zoom-out").disabled = view.zoom <= fitZoom;
   button("up").disabled = view.y >= limit.y;
   button("down").disabled = view.y <= -limit.y;
   button("left").disabled = view.x >= limit.x;
   button("right").disabled = view.x <= -limit.x;
-  button("reset").disabled = view.zoom === 1 && view.x === 0 && view.y === 0;
+  button("reset").disabled = isResetView();
 }
 
 // The arrows move the view, like scrolling: "down" shows more of the bottom
 // of the map, so the map itself moves up.
 function handleMapControl(action) {
-  if (action === "zoom-in") setZoom(view.zoom + zoomStep);
-  else if (action === "zoom-out") setZoom(view.zoom - zoomStep);
-  else if (action === "up") view.y += moveStep;
-  else if (action === "down") view.y -= moveStep;
-  else if (action === "left") view.x += moveStep;
-  else if (action === "right") view.x -= moveStep;
+  const viewport = document.getElementById("viewport");
+  const stepX = viewport.clientWidth * moveFraction;
+  const stepY = viewport.clientHeight * moveFraction;
+
+  if (action === "zoom-in") setZoom(view.zoom * zoomFactor);
+  else if (action === "zoom-out") setZoom(view.zoom / zoomFactor);
+  else if (action === "up") view.y += stepY;
+  else if (action === "down") view.y -= stepY;
+  else if (action === "left") view.x += stepX;
+  else if (action === "right") view.x -= stepX;
   else if (action === "reset") {
-    view.zoom = 1;
+    view.zoom = fitZoom;
     view.x = 0;
     view.y = 0;
   }
@@ -307,9 +347,16 @@ document.querySelectorAll(".map-controls button").forEach((button) => {
 
 document.getElementById("add-to-cart").addEventListener("click", addToCart);
 
+// Refit the hall when the frame changes size (window resize, phone rotation)
+new ResizeObserver(() => {
+  updateFitZoom();
+  renderView();
+}).observe(document.getElementById("viewport"));
+
 renderMap(); // must come before loadCart, which colors the seats on the map
 loadCart();
 renderLegend();
 renderDetails();
 renderCart();
+updateFitZoom();
 renderView();

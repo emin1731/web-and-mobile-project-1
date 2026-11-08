@@ -9,8 +9,9 @@
   --screen: #dcdcdc;
   --screen-border: #c1bfbf;
   --zone-front: #dbe8f4;
-  --zone-middle: #dcefd8;
+  --zone-standard: #dcefd8;
   --zone-premium: #f3e2b6;
+  --zone-back: #e8def3;
   --unavailable: #c4c0b9;
 
   --radius: 8px;
@@ -232,12 +233,16 @@ button {
   background: var(--zone-front);
 }
 
-.zone-middle {
-  background: var(--zone-middle);
+.zone-standard {
+  background: var(--zone-standard);
 }
 
 .zone-premium {
   background: var(--zone-premium);
+}
+
+.zone-back {
+  background: var(--zone-back);
 }
 
 .unavailable {
