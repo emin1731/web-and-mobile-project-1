@@ -291,13 +291,15 @@ function moveLimit() {
   };
 }
 
-function setZoom(newZoom) {
+// The anchor is the point that stays in place while zooming, measured from
+// the center of the frame: the center for the buttons, the mouse for the wheel.
+function setZoom(newZoom, anchorX = 0, anchorY = 0) {
   newZoom = clamp(newZoom, fitZoom, maxZoom);
   // Zooming in and back out can leave a rounding error, so snap to the fit
   if (newZoom / fitZoom < 1.001) newZoom = fitZoom;
-  // Scale the offset too, so the part of the map in the middle stays in the middle
-  view.x = (view.x * newZoom) / view.zoom;
-  view.y = (view.y * newZoom) / view.zoom;
+  const ratio = newZoom / view.zoom;
+  view.x = anchorX - (anchorX - view.x) * ratio;
+  view.y = anchorY - (anchorY - view.y) * ratio;
   view.zoom = newZoom;
 }
 

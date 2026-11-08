@@ -145,6 +145,21 @@ button {
   transition: transform 0.2s ease;
 }
 
+/* Mouse dragging: no text selection, and the map follows the mouse directly */
+#viewport {
+  cursor: grab;
+  user-select: none;
+}
+
+#viewport.dragging,
+#viewport.dragging * {
+  cursor: grabbing;
+}
+
+#viewport.dragging #map {
+  transition: none;
+}
+
 .map-controls {
   display: flex;
   flex-wrap: wrap;
