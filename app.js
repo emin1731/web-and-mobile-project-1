@@ -1,29 +1,36 @@
 // Data model:
-// seatsPerRow: number of seats in each row
-// aisleAfterSeat: seat number after which the aisle is located
 // zones: price categories, keyed by id (the CSS class is "zone-" + the id)
-// rows: each row has a name, the id of its zone, and its unavailable seat numbers
-const seatsPerRow = 6;
-const aisleAfterSeat = 3;
-
+// rows: listed in the order they are drawn on the map, from the back of the
+// hall to row 1, which is next to the screen at the bottom. Each row has:
+//   name: the row label
+//   zone: the id of its price zone
+//   seats: how many seats the row has, numbered from 1
+//   aislesAfter: seat numbers that have an aisle after them
+//   unavailable: seat numbers that can't be booked
 const zones = {
   front: { name: "Front", price: 15 },
   middle: { name: "Middle", price: 20 },
   premium: { name: "Premium", price: 25 },
 };
 
+// The IMAX hall: every row has a 4-seat block on each side of the center block
 const rows = [
-  { name: "A", zone: "front", unavailable: [1] },
-  { name: "B", zone: "front", unavailable: [5] },
-  { name: "C", zone: "middle", unavailable: [3] },
-  { name: "D", zone: "premium", unavailable: [6] },
-  { name: "E", zone: "premium", unavailable: [1] },
+  { name: "10", zone: "premium", seats: 17, aislesAfter: [4, 13], unavailable: [8, 9] },
+  { name: "9", zone: "premium", seats: 24, aislesAfter: [4, 20], unavailable: [1, 12, 13] },
+  { name: "8", zone: "premium", seats: 31, aislesAfter: [4, 27], unavailable: [15, 16, 30] },
+  { name: "7", zone: "middle", seats: 33, aislesAfter: [4, 29], unavailable: [5, 16, 17, 33] },
+  { name: "6", zone: "middle", seats: 33, aislesAfter: [4, 29], unavailable: [10, 11, 24] },
+  { name: "5", zone: "middle", seats: 33, aislesAfter: [4, 29], unavailable: [1, 2, 20] },
+  { name: "4", zone: "middle", seats: 33, aislesAfter: [4, 29], unavailable: [14, 28] },
+  { name: "3", zone: "front", seats: 33, aislesAfter: [4, 29], unavailable: [6, 18, 19] },
+  { name: "2", zone: "front", seats: 20, aislesAfter: [4, 16], unavailable: [10, 11] },
+  { name: "1", zone: "front", seats: 24, aislesAfter: [4, 20], unavailable: [1, 24] },
 ];
 
 // State:
 // selectedSeat: the seat shown in the details panel, or null
 // cart: the seats the user has added
-// A seat looks like { id: "C-3", row: "C", number: 3, zone: zones.middle }
+// A seat looks like { id: "7-3", row: "7", number: 3, zone: zones.middle }
 let selectedSeat = null;
 let cart = [];
 
@@ -49,8 +56,8 @@ function createSeat(row, number) {
     selectSeat(seatData);
   });
 
-  // Add the "aisle" class to seats that are next to the aisle
-  if (number === aisleAfterSeat) {
+  // Add the "aisle" class to seats that are next to an aisle
+  if (row.aislesAfter.includes(number)) {
     seat.classList.add("aisle");
   }
   if (row.unavailable.includes(number)) {
@@ -72,9 +79,9 @@ function renderMap() {
   for (const row of rows) {
     const rowEl = document.createElement("div");
     rowEl.className = "row";
-    // Show the row letter on both sides of the row
+    // Show the row number on both sides of the row
     rowEl.append(createRowLabel(row.name));
-    for (let number = 1; number <= seatsPerRow; number++) {
+    for (let number = 1; number <= row.seats; number++) {
       rowEl.append(createSeat(row, number));
     }
     rowEl.append(createRowLabel(row.name));
@@ -213,7 +220,7 @@ function loadCart() {
       !row ||
       !Number.isInteger(item.number) ||
       item.number < 1 ||
-      item.number > seatsPerRow ||
+      item.number > row.seats ||
       row.unavailable.includes(item.number)
     ) {
       continue;
