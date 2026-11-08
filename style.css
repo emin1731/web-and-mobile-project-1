@@ -86,7 +86,37 @@ button {
 
 @media (max-width: 800px) {
   .layout {
-    grid-template-columns: 1fr;
+    /* minmax(0, ...) lets the column shrink below the width of the seat rows */
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .side {
+    display: contents;
+  }
+
+  .details-panel {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.12);
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --gap: 12px;
+  }
+
+  .site-header {
+    padding: 12px var(--gap);
+  }
+
+  .site-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .layout {
+    padding: 8px;
   }
 }
 
@@ -95,8 +125,11 @@ button {
 #viewport {
   display: flex;
   align-items: center;
-  height: 360px;
+  height: clamp(280px, 55vh, 480px);
+  /* clip, unlike hidden, can't be scrolled, so focusing a seat outside the
+     frame doesn't shift the map out of sync with the controls */
   overflow: hidden;
+  overflow: clip;
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
@@ -110,6 +143,13 @@ button {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+}
+
+/* Big enough to tap comfortably on a touch screen */
+.map-controls button {
+  min-width: 40px;
+  min-height: 40px;
+  font-size: 1rem;
 }
 
 .map-controls button:disabled {
@@ -207,7 +247,7 @@ button {
 #legend {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--gap);
+  gap: 8px var(--gap);
   margin: var(--gap) 0 0;
   padding: 0;
   padding-bottom: 8px;
@@ -260,4 +300,34 @@ button {
   gap: 8px;
   padding: 6px 0;
   border-bottom: 1px solid var(--border);
+}
+
+/* Phones — at the end so these override the seat and details rules above */
+
+@media (max-width: 480px) {
+  /* Smaller seats so a whole row fits without moving the map */
+  .row {
+    gap: 4px;
+  }
+
+  .seat {
+    width: 32px;
+    height: 30px;
+    font-size: 0.8rem;
+  }
+
+  .seat.aisle {
+    margin-right: 14px;
+  }
+
+  .row-label {
+    width: 14px;
+    font-size: 0.85rem;
+  }
+
+  /* Details on one line to keep the pinned panel short */
+  #details p {
+    display: inline;
+    margin-right: 8px;
+  }
 }
