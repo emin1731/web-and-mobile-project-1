@@ -1,18 +1,25 @@
+/* Dark theme based on the ParkCinema website */
 :root {
-  --background: #f4f1ec;
-  --surface: #ffffff;
-  --text: #1f1d1a;
-  --text-muted: #6b665e;
-  --border: #ddd6cb;
-  --accent: #7a2e3b;
+  color-scheme: dark;
+  --background: #3b3b3b;
+  --header: #2e2e2e;
+  --surface: #474747;
+  --map-background: #575757;
+  --text: #ffffff;
+  --text-muted: #cfcfcf;
+  --border: #5e5e5e;
+  --button: #ececec;
+  --button-text: #2b2b2b;
+  --accent: #d7262c;
   --accent-text: #ffffff;
-  --screen: #dcdcdc;
-  --screen-border: #c1bfbf;
-  --zone-front: #dbe8f4;
-  --zone-standard: #dcefd8;
-  --zone-premium: #f3e2b6;
-  --zone-back: #e8def3;
-  --unavailable: #c4c0b9;
+  --screen: #d9d9d9;
+  --screen-text: #2b2b2b;
+  --zone-front: #b9d4f0;
+  --zone-standard: #bfe3b8;
+  --zone-premium: #f2d48a;
+  --zone-back: #d6c6ef;
+  --unavailable: #161616;
+  --unavailable-text: #7d7d7d;
 
   --radius: 8px;
   --gap: 16px;
@@ -35,9 +42,9 @@ body {
 /* Button */
 button {
   padding: 6px 12px;
-  color: var(--text);
-  background: var(--surface);
-  border: 1px solid var(--border);
+  color: var(--button-text);
+  background: var(--button);
+  border: 1px solid var(--button);
   border-radius: var(--radius);
   cursor: pointer;
 }
@@ -45,8 +52,9 @@ button {
 /* Page layout */
 .site-header {
   padding: var(--gap) 24px;
-  color: var(--accent-text);
-  background: var(--accent);
+  padding-bottom: 48px;
+  color: var(--text);
+  background: var(--header);
 }
 
 .site-header h1 {
@@ -54,9 +62,20 @@ button {
   font-size: 1.5rem;
 }
 
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  height: 36px;
+}
+
 .site-header .hint {
   margin: 4px 0 0;
   opacity: 0.85;
+  padding: 8px 0;
 }
 
 .layout {
@@ -99,7 +118,7 @@ button {
     position: sticky;
     bottom: 0;
     z-index: 1;
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.4);
   }
 }
 
@@ -116,6 +135,10 @@ button {
     font-size: 1.25rem;
   }
 
+  .logo {
+    height: 28px;
+  }
+
   .layout {
     padding: 8px;
   }
@@ -124,6 +147,7 @@ button {
 /* Map view — #viewport is the visible frame, #map moves and zooms inside it */
 
 #viewport {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -132,6 +156,7 @@ button {
      frame doesn't shift the map out of sync with the controls */
   overflow: hidden;
   overflow: clip;
+  background: var(--map-background);
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
@@ -160,17 +185,31 @@ button {
   transition: none;
 }
 
+/* The controls float over the frame and don't move with the map:
+   zoom in the top right corner, movement and reset in the bottom left */
 .map-controls {
+  position: absolute;
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  gap: 4px;
 }
 
-/* Big enough to tap comfortably on a touch screen */
+.zoom-controls {
+  top: 8px;
+  right: 8px;
+  flex-direction: column;
+}
+
+.move-controls {
+  bottom: 8px;
+  left: 8px;
+}
+
 .map-controls button {
-  min-width: 40px;
-  min-height: 40px;
-  font-size: 1rem;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 4px 8px;
+  font-size: 0.9rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
 .map-controls button:disabled {
@@ -184,13 +223,13 @@ button {
   width: 60%;
   margin: 24px auto 0;
   padding: 8px 0;
-  color: var(--text);
+  color: var(--screen-text);
   font-size: 0.85rem;
   letter-spacing: 0.1em;
   text-align: center;
   text-transform: uppercase;
   background-color: var(--screen);
-  border: 2px solid var(--screen-border);
+  border: 2px solid var(--screen);
   border-radius: var(--radius);
 }
 
@@ -238,7 +277,7 @@ button {
 }
 
 .seat:disabled {
-  color: var(--text-muted);
+  color: var(--unavailable-text);
   cursor: not-allowed;
 }
 
@@ -262,6 +301,7 @@ button {
 
 .unavailable {
   background: var(--unavailable);
+  border-color: var(--unavailable);
 }
 
 /* Seat states — after the zone colors so they take priority */
@@ -315,6 +355,12 @@ button {
 
 #details {
   margin-bottom: 12px;
+}
+
+#add-to-cart {
+  color: var(--accent-text);
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
 #add-to-cart:disabled {

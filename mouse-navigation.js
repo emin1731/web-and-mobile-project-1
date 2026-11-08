@@ -30,9 +30,10 @@ function setupMouseNavigation() {
   let lastX, lastY;
 
   viewport.addEventListener("pointerdown", (event) => {
+    moved = 0; // a new press, so the last drag no longer blocks clicks
     if (event.pointerType !== "mouse" || event.button !== 0) return; // left mouse button only
+    if (event.target.closest(".map-controls")) return; // pressing a map button isn't a drag
     dragging = true;
-    moved = 0;
     lastX = event.clientX;
     lastY = event.clientY;
   });

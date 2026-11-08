@@ -8,7 +8,10 @@
   </head>
   <body>
     <header class="site-header">
-      <h1>ParkCinema IMAX</h1>
+      <h1 class="brand">
+        <img class="logo" src="media/park-cinema-logo.png" alt="ParkCinema" />
+        <span>IMAX</span>
+      </h1>
       <p class="hint">
         Click a seat to see its details, then press Add to cart.
       </p>
@@ -21,27 +24,29 @@
             <div id="rows"></div>
             <div class="screen">Screen</div>
           </div>
+          <div class="map-controls zoom-controls">
+            <button type="button" data-action="zoom-in" aria-label="Zoom in">
+              +
+            </button>
+            <button type="button" data-action="zoom-out" aria-label="Zoom out">
+              -
+            </button>
+          </div>
+          <div class="map-controls move-controls">
+            <button type="button" data-action="up" aria-label="Move up">↑</button>
+            <button type="button" data-action="down" aria-label="Move down">
+              ↓
+            </button>
+            <button type="button" data-action="left" aria-label="Move left">
+              ←
+            </button>
+            <button type="button" data-action="right" aria-label="Move right">
+              →
+            </button>
+            <button type="button" data-action="reset">Reset</button>
+          </div>
         </div>
         <ul id="legend"></ul>
-        <div class="map-controls">
-          <button type="button" data-action="zoom-in" aria-label="Zoom in">
-            +
-          </button>
-          <button type="button" data-action="zoom-out" aria-label="Zoom out">
-            -
-          </button>
-          <button type="button" data-action="up" aria-label="Move up">↑</button>
-          <button type="button" data-action="down" aria-label="Move down">
-            ↓
-          </button>
-          <button type="button" data-action="left" aria-label="Move left">
-            ←
-          </button>
-          <button type="button" data-action="right" aria-label="Move right">
-            →
-          </button>
-          <button type="button" data-action="reset">Reset</button>
-        </div>
       </section>
 
       <aside class="side">
